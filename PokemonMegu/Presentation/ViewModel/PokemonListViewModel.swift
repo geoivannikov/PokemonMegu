@@ -37,7 +37,7 @@ final class PokemonListViewModel: ObservableObject {
         }
 
         defer {
-            Task { [self] in
+            Task {
                 await MainActor.run {
                     isLoading = false
                 }
@@ -47,12 +47,12 @@ final class PokemonListViewModel: ObservableObject {
         do {
             let newPokemons = try await loadUseCase.execute(offset: offset, limit: pageSize)
 
-            await MainActor.run { [self] in
+            await MainActor.run {
                 pokemons.append(contentsOf: newPokemons)
                 offset += pageSize
             }
         } catch {
-            await MainActor.run { [self] in
+            await MainActor.run {
                 errorMessage = error.localizedDescription
             }
         }
