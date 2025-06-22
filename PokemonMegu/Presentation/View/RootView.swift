@@ -8,20 +8,15 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject var viewModel: PokemonListViewModel
     @EnvironmentObject var coordinator: Coordinator
 
     var body: some View {
         NavigationStack(path: $coordinator.path) {
-            PokemonListView(viewModel: viewModel)
+            PokemonListView()
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
                     case .detail(let pokemon):
-                        let useCase = LoadPokemonDescriptionUseCase(
-                            remoteDataSource: PokemonRemoteDataSource(),
-                            pokemon: pokemon
-                        )
-                        let detailVM = PokemonDetailViewModel(loadUseCase: useCase)
+                        let detailVM = PokemonDetailViewModel(pokemon: pokemon)
                         PokemonDetailView(viewModel: detailVM)
                     }
                 }

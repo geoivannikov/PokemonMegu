@@ -11,13 +11,27 @@ import SwiftUI
 struct PokemonMeguApp: App {
     var body: some Scene {
         WindowGroup {
-            let remote = PokemonRemoteDataSource()
-            let useCase = LoadPokemonsUseCase(remoteDataSource: remote)
-            let vm = PokemonListViewModel(loadUseCase: useCase)
             let coordinator = Coordinator()
 
-            RootView(viewModel: vm)
-                            .environmentObject(coordinator)
+            RootView().environmentObject(coordinator)
+        }
+    }
+    
+    init() {
+        setupDependencies()
+    }
+    
+    private func setupDependencies() {
+        DIContainer.shared.register(PokemonRemoteDataSourceProtocol.self) {
+            PokemonRemoteDataSource()
+        }
+        
+        DIContainer.shared.register(LoadPokemonsUseCaseProtocol.self) {
+            LoadPokemonsUseCase(remoteDataSource: DIContainer.shared.resolve())
+        }
+        
+        DIContainer.shared.register(LoadPokemonDescriptionUseCaseProtocol.self) {
+            LoadPokemonDescriptionUseCase(remoteDataSource: DIContainer.shared.resolve())
         }
     }
 }

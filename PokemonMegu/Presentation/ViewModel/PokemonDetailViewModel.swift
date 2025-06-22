@@ -15,11 +15,14 @@ final class PokemonDetailViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let loadUseCase: LoadPokemonDescriptionUseCaseProtocol
+    private let pokemon: Pokemon
 
     // MARK: - Init
 
-    init(loadUseCase: LoadPokemonDescriptionUseCaseProtocol) {
+    init(loadUseCase: LoadPokemonDescriptionUseCaseProtocol = DIContainer.shared.resolve(),
+         pokemon: Pokemon) {
         self.loadUseCase = loadUseCase
+        self.pokemon = pokemon
     }
 
     // MARK: - Public Methods
@@ -40,7 +43,7 @@ final class PokemonDetailViewModel: ObservableObject {
         }
 
         do {
-            let result = try await loadUseCase.execute()
+            let result = try await loadUseCase.execute(pokemon: pokemon)
 
             await MainActor.run { [self] in
                 details = result

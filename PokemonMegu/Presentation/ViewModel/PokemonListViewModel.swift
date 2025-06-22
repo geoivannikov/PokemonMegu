@@ -23,7 +23,7 @@ final class PokemonListViewModel: ObservableObject {
 
     // MARK: - Init
 
-    init(loadUseCase: LoadPokemonsUseCaseProtocol) {
+    init(loadUseCase: LoadPokemonsUseCaseProtocol = DIContainer.shared.resolve()) {
         self.loadUseCase = loadUseCase
     }
 

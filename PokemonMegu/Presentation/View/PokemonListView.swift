@@ -11,7 +11,7 @@ struct PokemonListView: View {
     @EnvironmentObject private var coordinator: Coordinator
     @StateObject private var viewModel: PokemonListViewModel
 
-    init(viewModel: PokemonListViewModel) {
+    init(viewModel: PokemonListViewModel = PokemonListViewModel()) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
