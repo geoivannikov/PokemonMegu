@@ -2,12 +2,9 @@
 //  PokemonListViewModel.swift
 //  PokemonMegu
 //
-//  Created by Ivannikov-EXTERNAL Georgiy on 19.06.2025.
-//
 
 import Foundation
 
-@MainActor
 final class PokemonListViewModel: ObservableObject {
     // MARK: - Public State
 
@@ -33,17 +30,31 @@ final class PokemonListViewModel: ObservableObject {
     // MARK: - Public Methods
 
     func loadNextPage() async {
-        guard !isLoading else { return }
+        guard await MainActor.run(body: { !isLoading }) else { return }
 
-        isLoading = true
-        defer { isLoading = false }
+        await MainActor.run {
+            isLoading = true
+        }
+
+        defer {
+            Task { [self] in
+                await MainActor.run {
+                    isLoading = false
+                }
+            }
+        }
 
         do {
             let newPokemons = try await loadUseCase.execute(offset: offset, limit: pageSize)
-            pokemons.append(contentsOf: newPokemons)
-            offset += pageSize
+
+            await MainActor.run { [self] in
+                pokemons.append(contentsOf: newPokemons)
+                offset += pageSize
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            await MainActor.run { [self] in
+                errorMessage = error.localizedDescription
+            }
         }
     }
 }

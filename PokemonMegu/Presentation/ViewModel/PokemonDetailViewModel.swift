@@ -2,33 +2,53 @@
 //  PokemonDetailViewModel.swift
 //  PokemonMegu
 //
-//  Created by Ivannikov-EXTERNAL Georgiy on 22.06.2025.
-//
 
 import Foundation
 
-@MainActor
 final class PokemonDetailViewModel: ObservableObject {
+    // MARK: - Public State
+
     @Published private(set) var details = PokemonDetails()
     @Published private(set) var isLoading = false
     @Published var errorMessage: String?
 
+    // MARK: - Dependencies
+
     private let loadUseCase: LoadPokemonDescriptionUseCaseProtocol
+
+    // MARK: - Init
 
     init(loadUseCase: LoadPokemonDescriptionUseCaseProtocol) {
         self.loadUseCase = loadUseCase
     }
 
-    func load() async {
-        guard !isLoading else { return }
+    // MARK: - Public Methods
 
-        isLoading = true
-        defer { isLoading = false }
+    func load() async {
+        guard await MainActor.run(body: { [self] in !isLoading }) else { return }
+
+        await MainActor.run { [self] in
+            isLoading = true
+        }
+
+        defer {
+            Task { [self] in
+                await MainActor.run {
+                    isLoading = false
+                }
+            }
+        }
 
         do {
-            details = try await loadUseCase.execute()
+            let result = try await loadUseCase.execute()
+
+            await MainActor.run { [self] in
+                details = result
+            }
         } catch {
-            errorMessage = error.localizedDescription
+            await MainActor.run { [self] in
+                errorMessage = error.localizedDescription
+            }
         }
     }
 }
