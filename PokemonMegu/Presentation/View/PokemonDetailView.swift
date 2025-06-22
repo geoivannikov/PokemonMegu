@@ -10,36 +10,25 @@ import SwiftUI
 struct PokemonDetailView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel: PokemonDetailViewModel
-    
+
     init(viewModel: PokemonDetailViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
 
     var body: some View {
         ZStack(alignment: .top) {
-            viewModel.details.backgroundColor
-                .ignoresSafeArea()
+            viewModel.details.backgroundColor.ignoresSafeArea()
+
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 32) {
                         DescriptionSection(description: viewModel.details.description)
-
-                        HeightWeightSection(
-                            height: viewModel.details.height,
-                            weight: viewModel.details.weight
-                        )
-
-                        InfoSection(
-                            baseExperience: viewModel.details.baseExperience,
-                            species: viewModel.details.species,
-                            formsCount: viewModel.details.formsCount
-                        )
-
-                        TypeSection(
-                            types: viewModel.details.types,
-                            color: viewModel.details.backgroundColor
-                        )
-
+                        HeightWeightSection(height: viewModel.details.height, weight: viewModel.details.weight)
+                        InfoSection(baseExperience: viewModel.details.baseExperience,
+                                    species: viewModel.details.species,
+                                    formsCount: viewModel.details.formsCount)
+                        TypeSection(types: viewModel.details.types,
+                                    color: viewModel.details.backgroundColor)
                         Spacer(minLength: 40)
                     }
                     .padding(20)
@@ -53,15 +42,14 @@ struct PokemonDetailView: View {
             .padding(.top, 20)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
+                    Button {
                         presentationMode.wrappedValue.dismiss()
-                    }) {
+                    } label: {
                         Image(systemName: "chevron.left")
                             .foregroundColor(.white)
                             .font(.system(size: 20, weight: .medium))
                     }
                 }
-
                 ToolbarItem(placement: .principal) {
                     Text(viewModel.details.name.capitalized)
                         .font(.system(size: 22, weight: .bold))
@@ -70,9 +58,20 @@ struct PokemonDetailView: View {
             }
             .navigationBarBackButtonHidden(true)
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                await viewModel.load()
+            }
+            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil), actions: {
+                Button("OK", role: .cancel) {
+                    viewModel.errorMessage = nil
+                }
+            }, message: {
+                Text(viewModel.errorMessage ?? "")
+            })
         }
     }
 }
+
 
 private struct DescriptionSection: View {
     let description: String

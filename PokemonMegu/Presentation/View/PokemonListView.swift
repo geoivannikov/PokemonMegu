@@ -29,13 +29,11 @@ struct PokemonListView: View {
                     Spacer()
                 }
                 .padding(-16)
-
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 16) {
                         ForEach(viewModel.pokemons) { pokemon in
-                            let isLast: Bool = pokemon.id == viewModel.pokemons.last?.id
-                            PokemonListItem(pokemon: pokemon, isLast: isLast)
-                            {
+                            let isLast = (pokemon.id == viewModel.pokemons.last?.id)
+                            PokemonListItem(pokemon: pokemon, isLast: isLast) {
                                 Task { await viewModel.loadNextPage() }
                             }
                         }
@@ -44,17 +42,21 @@ struct PokemonListView: View {
                 }
                 .scrollIndicators(.hidden)
                 .scrollBounceBehavior(.basedOnSize)
+
+                if viewModel.isLoading {
+                    ProgressView()
+                        .padding()
+                }
             }
             .navigationTitle("Pokedex")
             .navigationBarTitleDisplayMode(.large)
-            .overlay {
-                if viewModel.isLoading {
-                    ProgressView()
-                }
-            }
+        }
+        .task {
+            await viewModel.loadNextPage()
         }
     }
 }
+
 
 private struct PokemonListItem: View {
     let pokemon: Pokemon
@@ -72,9 +74,11 @@ private struct PokemonListItem: View {
 
     @ViewBuilder
     private func destinationView() -> some View {
-        let useCase = LoadPokemonDescriptionUseCase(remoteDataSource: PokemonRemoteDataSource(), pokemon: pokemon)
+        let useCase = LoadPokemonDescriptionUseCase(
+            remoteDataSource: PokemonRemoteDataSource(),
+            pokemon: pokemon
+        )
         let detailVM = PokemonDetailViewModel(loadUseCase: useCase)
         PokemonDetailView(viewModel: detailVM)
     }
 }
-

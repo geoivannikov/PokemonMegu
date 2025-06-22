@@ -7,37 +7,28 @@
 
 import Foundation
 
+@MainActor
 final class PokemonDetailViewModel: ObservableObject {
-    @Published private(set) var details: PokemonDetails = PokemonDetails()
-    @Published private(set) var isLoading: Bool = false
+    @Published private(set) var details = PokemonDetails()
+    @Published private(set) var isLoading = false
     @Published var errorMessage: String?
-
-    // MARK: - Dependencies
 
     private let loadUseCase: LoadPokemonDescriptionUseCaseProtocol
 
-    // MARK: - Paging
-
-    var offset: Int = 0
-    private let pageSize: Int = 20
-
-    // MARK: - Init
-
     init(loadUseCase: LoadPokemonDescriptionUseCaseProtocol) {
         self.loadUseCase = loadUseCase
-        Task { await loadDescription() }
     }
-    
-    private func loadDescription() async {
-        do {
-            let details: PokemonDetails = try await loadUseCase.execute()
-            
-            await MainActor.run {
-                self.details = details
-            }
 
+    func load() async {
+        guard !isLoading else { return }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            details = try await loadUseCase.execute()
         } catch {
-//            await setError(message: error.localizedDescription)
+            errorMessage = error.localizedDescription
         }
     }
 }

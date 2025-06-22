@@ -12,27 +12,23 @@ struct PokemonCardView: View {
 
     var body: some View {
         HStack {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(pokemon.name)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
-
-                HStack {
-                    VStack {
-                        ForEach(pokemon.types, id: \.self) { type in
-                            Text(type)
-                                .font(.system(size: 8, weight: .bold))
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.white.opacity(0.2))
-                                .foregroundColor(.white)
-                                .cornerRadius(6)
-                        }
-                        Spacer()
-                    }
-                    Spacer()
+                ForEach(pokemon.types, id: \.self) { type in
+                    Text(type)
+                        .font(.system(size: 8, weight: .bold))
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 2)
+                        .background(Color.white.opacity(0.2))
+                        .foregroundColor(.white)
+                        .cornerRadius(6)
                 }
-            }.padding(.top, 16)
+                Spacer()
+            }
+            .padding(.top, 16)
+            Spacer()
             ZStack {
                 VStack {
                     Spacer()
@@ -43,17 +39,14 @@ struct PokemonCardView: View {
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.white.opacity(0.2))
                         .padding(.trailing, 8)
+                    Spacer()
                     AsyncImage(url: URL(string: pokemon.imgURL)) { phase in
-                        switch phase {
-                        case .success(let image):
+                        if case .success(let image) = phase {
                             image
                                 .resizable()
                                 .scaledToFit()
-                        default:
-                            Image("default")
-                                .resizable()
-                                .scaledToFit()
-                                .hidden()
+                        } else {
+                            Image.hiddenDefault
                         }
                     }
                 }
