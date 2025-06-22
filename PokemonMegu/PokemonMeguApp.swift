@@ -22,16 +22,6 @@ struct PokemonMeguApp: App {
     }
     
     private func setupDependencies() {
-        DIContainer.shared.register(PokemonRemoteDataSourceProtocol.self) {
-            PokemonRemoteDataSource()
-        }
-        
-        DIContainer.shared.register(LoadPokemonsUseCaseProtocol.self) {
-            LoadPokemonsUseCase(remoteDataSource: DIContainer.shared.resolve())
-        }
-        
-        DIContainer.shared.register(LoadPokemonDescriptionUseCaseProtocol.self) {
-            LoadPokemonDescriptionUseCase(remoteDataSource: DIContainer.shared.resolve())
-        }
+        DIContainer.shared.registerAll()
     }
 }

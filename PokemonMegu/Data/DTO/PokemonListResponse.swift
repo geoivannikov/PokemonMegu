@@ -9,11 +9,11 @@ import Foundation
 
 // MARK: - Pokemon List Response
 
-struct PokemonListResponse: Decodable {
+struct PokemonListResponse: Codable {
     let results: [PokemonEntry]
 }
 
-struct PokemonEntry: Decodable {
+struct PokemonEntry: Codable {
     let name: String
     let url: String
 }

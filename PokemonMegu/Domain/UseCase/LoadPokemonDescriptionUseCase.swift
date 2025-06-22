@@ -12,7 +12,7 @@ protocol LoadPokemonDescriptionUseCaseProtocol {
 final class LoadPokemonDescriptionUseCase: LoadPokemonDescriptionUseCaseProtocol {
     private let remoteDataSource: PokemonRemoteDataSourceProtocol
 
-    init(remoteDataSource: PokemonRemoteDataSourceProtocol) {
+    init(remoteDataSource: PokemonRemoteDataSourceProtocol = DIContainer.shared.resolve()) {
         self.remoteDataSource = remoteDataSource
     }
 

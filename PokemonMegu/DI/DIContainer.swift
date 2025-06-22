@@ -29,4 +29,18 @@ final class DIContainer: Resolver {
     func reset() {
         factories.removeAll()
     }
+    
+    func registerAll() {
+        DIContainer.shared.register(PokemonRemoteDataSourceProtocol.self) {
+            PokemonRemoteDataSource()
+        }
+        
+        DIContainer.shared.register(LoadPokemonsUseCaseProtocol.self) {
+            LoadPokemonsUseCase(remoteDataSource: DIContainer.shared.resolve())
+        }
+        
+        DIContainer.shared.register(LoadPokemonDescriptionUseCaseProtocol.self) {
+            LoadPokemonDescriptionUseCase(remoteDataSource: DIContainer.shared.resolve())
+        }
+    }
 }

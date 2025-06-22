@@ -7,7 +7,7 @@
 
 // MARK: - Pokemon Detail Response
 
-struct PokemonDetailResponse: Decodable {
+struct PokemonDetailResponse: Codable {
     let id: Int
     let name: String
     let types: [PokemonTypeEntry]
@@ -25,16 +25,16 @@ struct PokemonDetailResponse: Decodable {
 
 // MARK: - Type Info
 
-struct PokemonTypeEntry: Decodable {
+struct PokemonTypeEntry: Codable {
     let type: NamedAPIResource
 }
 
 // MARK: - Sprites
 
-struct PokemonSprites: Decodable {
+struct PokemonSprites: Codable {
     let other: OtherSprites
 
-    struct OtherSprites: Decodable {
+    struct OtherSprites: Codable {
         let officialArtwork: Artwork
 
         enum CodingKeys: String, CodingKey {
@@ -42,7 +42,7 @@ struct PokemonSprites: Decodable {
         }
     }
 
-    struct Artwork: Decodable {
+    struct Artwork: Codable {
         let frontDefault: String
 
         enum CodingKeys: String, CodingKey {
@@ -53,7 +53,7 @@ struct PokemonSprites: Decodable {
 
 // MARK: - Shared Resource
 
-struct NamedAPIResource: Decodable {
+struct NamedAPIResource: Codable {
     let name: String
     let url: String?
 

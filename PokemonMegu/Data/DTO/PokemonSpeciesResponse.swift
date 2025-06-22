@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct PokemonSpeciesResponse: Decodable {
+struct PokemonSpeciesResponse: Codable {
     let flavorText: String
     let genus: String
     let formsCount: Int
@@ -20,21 +20,21 @@ struct PokemonSpeciesResponse: Decodable {
 
     // MARK: - Nested types
 
-    private struct FlavorTextEntry: Decodable {
+    private struct FlavorTextEntry: Codable {
         let flavor_text: String
         let language: NamedAPIResource
     }
 
-    private struct GenusEntry: Decodable {
+    private struct GenusEntry: Codable {
         let genus: String
         let language: NamedAPIResource
     }
 
-    private struct Variety: Decodable {
+    private struct Variety: Codable {
         let is_default: Bool
     }
 
-    private struct NamedAPIResource: Decodable {
+    private struct NamedAPIResource: Codable {
         let name: String
     }
 
@@ -60,5 +60,28 @@ struct PokemonSpeciesResponse: Decodable {
         // Varieties count
         let varieties = try container.decode([Variety].self, forKey: .varieties)
         self.formsCount = varieties.count
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(
+            [FlavorTextEntry(flavor_text: flavorText, language: .init(name: "en"))],
+            forKey: .flavorTextEntries
+        )
+        try container.encode(
+            [GenusEntry(genus: genus, language: .init(name: "en"))],
+            forKey: .genera
+        )
+        try container.encode(
+            Array(repeating: Variety(is_default: true), count: formsCount),
+            forKey: .varieties
+        )
+    }
+    
+    init(flavorText: String, genus: String, formsCount: Int) {
+        self.flavorText = flavorText
+        self.genus = genus
+        self.formsCount = formsCount
     }
 }
