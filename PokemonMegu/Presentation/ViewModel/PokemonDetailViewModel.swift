@@ -8,15 +8,7 @@
 import Foundation
 
 final class PokemonDetailViewModel: ObservableObject {
-    @Published private(set) var details: PokemonDetails = PokemonDetails(name: "",
-                                                                         description: "",
-                                                                         weight: 0,
-                                                                         height: 0,
-                                                                         baseExep: 0,
-                                                                         species: "",
-                                                                         types: [],
-                                                                         formsCount: 0,
-                                                                         backgroundColor: .clear)
+    @Published private(set) var details: PokemonDetails = PokemonDetails()
     @Published private(set) var isLoading: Bool = false
     @Published var errorMessage: String?
 

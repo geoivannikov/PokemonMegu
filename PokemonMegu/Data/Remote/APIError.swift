@@ -9,7 +9,7 @@ import Foundation
 
 enum APIError: Error, LocalizedError {
     case invalidURL(String)
-    case invalidResponse(URLResponse)
+    case invalidResponse(URLResponse?)
     case decodingFailed(Error)
     case network(Error)
     case unknown
@@ -19,7 +19,7 @@ enum APIError: Error, LocalizedError {
         case .invalidURL(let url):
             return "Invalid URL: \(url)"
         case .invalidResponse(let response):
-            return "Invalid server response: \(response)"
+            return "Invalid server response: \(String(describing: response))"
         case .decodingFailed(let error):
             return "Failed to decode data: \(error.localizedDescription)"
         case .network(let error):

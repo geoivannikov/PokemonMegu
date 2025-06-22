@@ -12,8 +12,7 @@ struct PokemonMeguApp: App {
     var body: some Scene {
         WindowGroup {
             let remote = PokemonRemoteDataSource()
-            let repo = PokemonRepository(remoteDataSource: remote)
-            let useCase = LoadPokemonsUseCase(repository: repo)
+            let useCase = LoadPokemonsUseCase(remoteDataSource: remote)
             let vm = PokemonListViewModel(loadUseCase: useCase)
 
             PokemonListView(viewModel: vm)

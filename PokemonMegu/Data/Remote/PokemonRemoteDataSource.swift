@@ -10,39 +10,55 @@ import Foundation
 protocol PokemonRemoteDataSourceProtocol {
     func fetchPokemonsList(offset: Int, limit: Int) async throws -> PokemonListResponse
     func fetchPokemon(entry: PokemonEntry) async throws -> PokemonDetailResponse
-    func fetchPokemonDescription(name: String) async throws -> PokemonSpecies
+    func fetchPokemonDescription(name: String) async throws -> PokemonSpeciesResponse
 }
 
 final class PokemonRemoteDataSource: PokemonRemoteDataSourceProtocol {
     private let session: URLSession
+    private let baseURL = "https://pokeapi.co/api/v2"
 
     init(session: URLSession = .shared) {
         self.session = session
     }
-    
+
     func fetchPokemonsList(offset: Int, limit: Int) async throws -> PokemonListResponse {
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon?limit=\(limit)&offset=\(offset)")!
-        let (data, _) = try await session.data(from: url)
-        let list = try JSONDecoder().decode(PokemonListResponse.self, from: data)
-        return list
+        let endpoint = "\(baseURL)/pokemon?limit=\(limit)&offset=\(offset)"
+        return try await fetch(urlString: endpoint, as: PokemonListResponse.self)
     }
-    
+
     func fetchPokemon(entry: PokemonEntry) async throws -> PokemonDetailResponse {
-        guard let detailURL = URL(string: entry.url) else {
-            print("❌ Invalid detail URL for \(entry.name)")
+        guard let url = URL(string: entry.url) else {
             throw APIError.invalidURL(entry.url)
         }
-
-        let (detailData, _) = try await URLSession.shared.data(from: detailURL)
-        let detail = try JSONDecoder().decode(PokemonDetailResponse.self, from: detailData)
-
-        return detail
+        return try await fetch(url: url, as: PokemonDetailResponse.self)
     }
-    
-    func fetchPokemonDescription(name: String) async throws -> PokemonSpecies {
-        let url = URL(string: "https://pokeapi.co/api/v2/pokemon-species/\(name)")!
-        let (data, _) = try await URLSession.shared.data(from: url)
-//        print("QLog \(String(data: data, encoding: .utf8))")
-        return try JSONDecoder().decode(PokemonSpecies.self, from: data)
+
+    func fetchPokemonDescription(name: String) async throws -> PokemonSpeciesResponse {
+        let endpoint = "\(baseURL)/pokemon-species/\(name)"
+        return try await fetch(urlString: endpoint, as: PokemonSpeciesResponse.self)
+    }
+
+    // MARK: - Private helpers
+
+    private func fetch<T: Decodable>(urlString: String, as type: T.Type) async throws -> T {
+        guard let url = URL(string: urlString) else {
+            throw APIError.invalidURL(urlString)
+        }
+        return try await fetch(url: url, as: type)
+    }
+
+    private func fetch<T: Decodable>(url: URL, as type: T.Type) async throws -> T {
+        let (data, response) = try await session.data(from: url)
+
+        guard let httpResponse = response as? HTTPURLResponse,
+              (200..<300).contains(httpResponse.statusCode) else {
+            throw APIError.invalidResponse(nil)
+        }
+
+        do {
+            return try JSONDecoder().decode(T.self, from: data)
+        } catch {
+            throw APIError.decodingFailed(error)
+        }
     }
 }

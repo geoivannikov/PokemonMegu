@@ -72,10 +72,7 @@ private struct PokemonListItem: View {
 
     @ViewBuilder
     private func destinationView() -> some View {
-        let useCase = LoadPokemonDescriptionUseCase(
-            repository: PokemonRepository(remoteDataSource: PokemonRemoteDataSource()),
-            pokemon: pokemon
-        )
+        let useCase = LoadPokemonDescriptionUseCase(remoteDataSource: PokemonRemoteDataSource(), pokemon: pokemon)
         let detailVM = PokemonDetailViewModel(loadUseCase: useCase)
         PokemonDetailView(viewModel: detailVM)
     }

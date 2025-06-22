@@ -30,7 +30,7 @@ struct PokemonDetailView: View {
                         )
 
                         InfoSection(
-                            baseExperience: viewModel.details.baseExep,
+                            baseExperience: viewModel.details.baseExperience,
                             species: viewModel.details.species,
                             formsCount: viewModel.details.formsCount
                         )

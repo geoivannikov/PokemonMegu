@@ -11,24 +11,15 @@ protocol LoadPokemonDescriptionUseCaseProtocol {
 
 final class LoadPokemonDescriptionUseCase: LoadPokemonDescriptionUseCaseProtocol {
     private let pokemon: Pokemon
-    private let repository: PokemonRepository
+    private let remoteDataSource: PokemonRemoteDataSourceProtocol
 
-    init(repository: PokemonRepository, pokemon: Pokemon) {
-        self.repository = repository
+    init(remoteDataSource: PokemonRemoteDataSourceProtocol, pokemon: Pokemon) {
+        self.remoteDataSource = remoteDataSource
         self.pokemon = pokemon
     }
 
     func execute() async throws -> PokemonDetails {
-        let pokemonListResponse = try await repository.fetchPokemonDescription(name: pokemon.name)
-        return PokemonDetails(name: pokemon.name,
-                              description: pokemonListResponse.flavorText,
-                              weight: pokemon.weight,
-                              height: pokemon.height,
-                              baseExep: pokemon.baseExperience,
-                              species: pokemonListResponse.genus,
-                              types: pokemon.types,
-                              formsCount: pokemonListResponse.formsCount,
-                              backgroundColor: pokemon.backgroundColor)
+        let speciesResponse = try await remoteDataSource.fetchPokemonDescription(name: pokemon.name)
+        return PokemonDetails(pokemon: pokemon, pokemonSpeciesResponse: speciesResponse)
     }
 }
-
