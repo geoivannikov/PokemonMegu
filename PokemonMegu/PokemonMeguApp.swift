@@ -14,8 +14,10 @@ struct PokemonMeguApp: App {
             let remote = PokemonRemoteDataSource()
             let useCase = LoadPokemonsUseCase(remoteDataSource: remote)
             let vm = PokemonListViewModel(loadUseCase: useCase)
+            let coordinator = Coordinator()
 
-            PokemonListView(viewModel: vm)
+            RootView(viewModel: vm)
+                            .environmentObject(coordinator)
         }
     }
 }

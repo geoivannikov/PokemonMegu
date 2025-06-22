@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PokemonListView: View {
+    @EnvironmentObject private var coordinator: Coordinator
     @StateObject private var viewModel: PokemonListViewModel
 
     init(viewModel: PokemonListViewModel) {
@@ -17,40 +18,38 @@ struct PokemonListView: View {
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
-        NavigationView {
-            ZStack(alignment: .topTrailing) {
-                VStack {
-                    HStack {
-                        Spacer()
-                        Image("pokeball")
-                            .padding(.trailing, 16)
-                    }
-                    .ignoresSafeArea()
+        ZStack(alignment: .topTrailing) {
+            VStack {
+                HStack {
                     Spacer()
+                    Image("pokeball")
+                        .padding(.trailing, 16)
                 }
-                .padding(-16)
-                ScrollView {
-                    LazyVGrid(columns: columns, spacing: 16) {
-                        ForEach(viewModel.pokemons) { pokemon in
-                            let isLast = (pokemon.id == viewModel.pokemons.last?.id)
-                            PokemonListItem(pokemon: pokemon, isLast: isLast) {
-                                Task { await viewModel.loadNextPage() }
-                            }
+                .ignoresSafeArea()
+                Spacer()
+            }
+            .padding(-16)
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+                    ForEach(viewModel.pokemons) { pokemon in
+                        let isLast = (pokemon.id == viewModel.pokemons.last?.id)
+                        PokemonListItem(pokemon: pokemon, isLast: isLast) {
+                            Task { await viewModel.loadNextPage() }
                         }
                     }
-                    .padding()
                 }
-                .scrollIndicators(.hidden)
-                .scrollBounceBehavior(.basedOnSize)
-
-                if viewModel.isLoading {
-                    ProgressView()
-                        .padding()
-                }
+                .padding()
             }
-            .navigationTitle("Pokedex")
-            .navigationBarTitleDisplayMode(.large)
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
+
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding()
+            }
         }
+        .navigationTitle("Pokedex")
+        .navigationBarTitleDisplayMode(.large)
         .task {
             await viewModel.loadNextPage()
         }
@@ -59,26 +58,19 @@ struct PokemonListView: View {
 
 
 private struct PokemonListItem: View {
+    @EnvironmentObject var coordinator: Coordinator
     let pokemon: Pokemon
     let isLast: Bool
     let onAppear: () -> Void
 
     var body: some View {
-        NavigationLink(destination: destinationView()) {
+        Button {
+            coordinator.showDetail(pokemon: pokemon)
+        } label: {
             PokemonCardView(pokemon: pokemon)
         }
         .onAppear {
             if isLast { onAppear() }
         }
-    }
-
-    @ViewBuilder
-    private func destinationView() -> some View {
-        let useCase = LoadPokemonDescriptionUseCase(
-            remoteDataSource: PokemonRemoteDataSource(),
-            pokemon: pokemon
-        )
-        let detailVM = PokemonDetailViewModel(loadUseCase: useCase)
-        PokemonDetailView(viewModel: detailVM)
     }
 }
