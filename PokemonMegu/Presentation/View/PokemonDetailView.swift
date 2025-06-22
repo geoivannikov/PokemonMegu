@@ -75,13 +75,12 @@ struct PokemonDetailView: View {
     }
 }
 
-
 private struct DescriptionSection: View {
     let description: String
 
     var body: some View {
         Text(description)
-            .font(.system(size: 14))
+            .sectionValue()
             .padding(.top)
     }
 }
@@ -93,25 +92,16 @@ private struct HeightWeightSection: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("Height")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.gray)
-                Text("\(height) cm")
-                    .font(.system(size: 14))
+                Text("Height").sectionLabel()
+                Text("\(height) cm").sectionValue()
             }
             Spacer()
             VStack(alignment: .leading) {
-                Text("Weight")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.gray)
-                Text("\(weight) kg")
-                    .font(.system(size: 14))
+                Text("Weight").sectionLabel()
+                Text("\(weight) kg").sectionValue()
             }
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(10)
-        .shadow(color: .gray, radius: 5, x: 0, y: 3)
+        .cardBackground()
     }
 }
 
@@ -126,23 +116,14 @@ private struct InfoSection: View {
                 .font(.headline)
             HStack {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("Base exp:")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.gray)
-                    Text("Species:")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.gray)
-                    Text("Forms count:")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.gray)
+                    Text("Base exp:").sectionLabel()
+                    Text("Species:").sectionLabel()
+                    Text("Forms count:").sectionLabel()
                 }
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("\(baseExperience) exp")
-                        .font(.system(size: 14))
-                    Text(species)
-                        .font(.system(size: 14))
-                    Text("\(formsCount)")
-                        .font(.system(size: 14))
+                    Text("\(baseExperience) exp").sectionValue()
+                    Text(species).sectionValue()
+                    Text("\(formsCount)").sectionValue()
                 }
             }
         }

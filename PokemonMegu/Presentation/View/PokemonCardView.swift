@@ -17,14 +17,10 @@ struct PokemonCardView: View {
                     .lineLimit(1)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
+
                 ForEach(pokemon.types, id: \.self) { type in
                     Text(type)
-                        .font(.system(size: 8, weight: .bold))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.white.opacity(0.2))
-                        .foregroundColor(.white)
-                        .cornerRadius(6)
+                        .typeTag()
                 }
                 Spacer()
             }
@@ -53,9 +49,6 @@ struct PokemonCardView: View {
                 }
             }
         }
-        .padding([.leading, .top], 8)
-        .background(pokemon.backgroundColor)
-        .cornerRadius(12)
-        .shadow(radius: 2)
+        .cardStyle(background: pokemon.backgroundColor)
     }
 }
