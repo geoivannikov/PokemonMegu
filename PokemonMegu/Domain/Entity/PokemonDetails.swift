@@ -50,3 +50,9 @@ extension PokemonDetails {
         self.backgroundColor = .clear
     }
 }
+
+extension PokemonDetails {
+    var isEmpty: Bool {
+        description == ""
+    }
+}

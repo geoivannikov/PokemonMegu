@@ -18,20 +18,23 @@ struct PokemonDetailView: View {
     var body: some View {
         ZStack(alignment: .top) {
             viewModel.details.backgroundColor.ignoresSafeArea()
-
             VStack(spacing: 0) {
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 32) {
-                        DescriptionSection(description: viewModel.details.description)
-                        HeightWeightSection(height: viewModel.details.height, weight: viewModel.details.weight)
-                        InfoSection(baseExperience: viewModel.details.baseExperience,
-                                    species: viewModel.details.species,
-                                    formsCount: viewModel.details.formsCount)
-                        TypeSection(types: viewModel.details.types,
-                                    color: viewModel.details.backgroundColor)
-                        Spacer(minLength: 40)
+                if viewModel.details.isEmpty {
+                    EmptyView()
+                } else {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 32) {
+                            DescriptionSection(description: viewModel.details.description)
+                            HeightWeightSection(height: viewModel.details.height, weight: viewModel.details.weight)
+                            InfoSection(baseExperience: viewModel.details.baseExperience,
+                                        species: viewModel.details.species,
+                                        formsCount: viewModel.details.formsCount)
+                            TypeSection(types: viewModel.details.types,
+                                        color: viewModel.details.backgroundColor)
+                            Spacer(minLength: 40)
+                        }
+                        .padding(20)
                     }
-                    .padding(20)
                 }
             }
             .background(

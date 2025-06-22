@@ -14,6 +14,7 @@ struct PokemonCardView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(pokemon.name)
+                    .lineLimit(1)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
                 ForEach(pokemon.types, id: \.self) { type in
