@@ -9,7 +9,7 @@ import Foundation
 
 protocol PokemonRemoteDataSourceProtocol {
     func fetchPokemonsList(offset: Int, limit: Int) async throws -> PokemonListResponse
-    func fetchPokemon(entry: PokemonEntry) async throws -> PokemonDetailResponse
+    func fetchPokemon(url: String) async throws -> PokemonDetailResponse
     func fetchPokemonDescription(name: String) async throws -> PokemonSpeciesResponse
 }
 
@@ -26,9 +26,9 @@ final class PokemonRemoteDataSource: PokemonRemoteDataSourceProtocol {
         return try await fetch(urlString: endpoint, as: PokemonListResponse.self)
     }
 
-    func fetchPokemon(entry: PokemonEntry) async throws -> PokemonDetailResponse {
-        guard let url = URL(string: entry.url) else {
-            throw APIError.invalidURL(entry.url)
+    func fetchPokemon(url: String) async throws -> PokemonDetailResponse {
+        guard let url = URL(string: url) else {
+            throw APIError.invalidURL(url)
         }
         return try await fetch(url: url, as: PokemonDetailResponse.self)
     }

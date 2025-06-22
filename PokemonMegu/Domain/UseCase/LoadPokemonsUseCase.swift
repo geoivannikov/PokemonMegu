@@ -20,22 +20,20 @@ final class LoadPokemonsUseCase: LoadPokemonsUseCaseProtocol {
         let response = try await remoteDataSource.fetchPokemonsList(offset: offset, limit: limit)
         let entries = response.results
 
-        var detailResponses: [PokemonDetailResponse] = []
-
-        try await withThrowingTaskGroup(of: PokemonDetailResponse?.self) { group in
-            for entry in entries {
+        let detailResponses: [PokemonDetailResponse] = try await withThrowingTaskGroup(of: PokemonDetailResponse?.self) { group in
+            entries.forEach { entry in
                 group.addTask {
-                    try? await self.remoteDataSource.fetchPokemon(entry: entry)
+                    try? await self.remoteDataSource.fetchPokemon(url: entry.url)
                 }
             }
 
-            for try await response in group {
-                if let model = response {
-                    detailResponses.append(model)
+            return try await group.reduce(into: []) { result, next in
+                if let model = next {
+                    result.append(model)
                 }
             }
         }
 
-        return detailResponses.map { Pokemon(detail: $0) }
+        return detailResponses.map(Pokemon.init)
     }
 }
